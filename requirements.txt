@@ -1,0 +1,6 @@
+detectron2 @ git+https://github.com/facebookresearch/detectron2.git@0703e08a5f589f7503a3fbfce41309c80204eec8
+ego4d
+lvis
+notebook
+opencv-python
+submitit
