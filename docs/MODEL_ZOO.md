@@ -25,7 +25,7 @@ from the paco repo root.
 
 ## Models trained on joint PACO (PACO-LVIS + PACO-EGO4D) dataset
 
-Configs listed in the following table by default specify PACO-LVIS test datasets. To test on PACO-EGO4D dataset the configs were overridden through the launch command by specifying the `dataloader.test.dataset.names="paco_lvis_v1_test"` option. For example, to evaluate ViT-B FPN model on PACO-EGO4D query dataset, we ran:
+Configs listed in the following table by default specify PACO-LVIS test datasets. To test on PACO-EGO4D dataset the configs were overridden through the launch command by specifying the `dataloader.test.dataset.names="paco_ego4d_v1_test"` option. For example, to evaluate ViT-B FPN model on PACO-EGO4D query dataset, we ran:
 ```
 ./tools/lazyconfig_train_net.py --config-file ./configs/query_eval_configs/vit_b_fpn_query_eval.py --eval-only --num-gpus 8 train.init_checkpoint=./models/vit_b_fpn_joint.pth dataloader.test.dataset.names=paco_ego4d_v1_test
 ```

@@ -6,7 +6,7 @@ PACO is a detection dataset that goes beyond traditional object boxes and masks 
 
 This repository contains data loaders, training and evaluation scripts for joint object-part-attributes detection models, query evaluation scripts, and visualization notebooks for PACO dataset.
 
-[[Paper](TBD)][[Website](https://paco.metademolab.com)]
+[[Paper](https://arxiv.org/abs/2301.01795)][[Website](https://paco.metademolab.com)]
 
 ## Setup
 
@@ -110,7 +110,7 @@ To evaluate a pre-trained ViT-L FPN model on PACO-EGO4D query dataset on a singl
 @inproceedings{ramanathan2023paco,
   title={{PACO}: Parts and Attributes of Common Objects},
   author={Ramanathan, Vignesh and Kalia, Anmol and Petrovic, Vladan and Wen, Yi and Zheng, Baixue and Guo, Baishan and Wang, Rui and Marquez, Aaron and Kovvuri, Rama and Kadian, Abhishek and Mousavi, Amir and Song, Yiwen and Dubey, Abhimanyu and Mahajan, Dhruv},
-  booktitle={TBD},
+  booktitle={arXiv preprint arXiv:2301.01795},
   year={2023}}
 }
 ```
