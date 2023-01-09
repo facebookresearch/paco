@@ -185,7 +185,7 @@ def load_json(json_file, image_root, dataset_name=None, extra_annotation_keys=No
 
 
 def get_instances_meta(dataset_name):
-    # we assume that ego4d is always trained in conjuction with lvis
+    # we assume that ego4d is always trained in conjunction with lvis
     if "ego4d" in dataset_name or "joint" in dataset_name:
         return _get_lvis_ego4d_instances_meta()
     else:
