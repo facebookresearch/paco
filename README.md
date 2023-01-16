@@ -47,6 +47,11 @@ To download PACO annotations:
 cd /path/to/paco/annotations
 wget https://dl.fbaipublicfiles.com/paco/annotations/paco_lvis_v1.zip
 wget https://dl.fbaipublicfiles.com/paco/annotations/paco_ego4d_v1.zip
+diff <(sha256sum paco_ego4d_v1.zip) <(echo "9a2de524dd64ad8f807f0d1ad2e96de590b9fb222e55192ccfdd7b7b09b89252  paco_ego4d_v1.zip")
+diff <(sha256sum paco_lvis_v1.zip) <(echo "02ac4edb22c251e07853e6231d69aec3fad0a180f03de2f8c880650322debc80  paco_lvis_v1.zip")
+```
+and if SHA-256 checksum matches
+```
 unzip paco_lvis_v1.zip
 unzip paco_ego4d_v1.zip
 ```
