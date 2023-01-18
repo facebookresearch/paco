@@ -306,7 +306,7 @@ class PACOQueryEvalAPI:
                 num_pos = len(pos_scores)
                 if num_pos > 0:
                     scores = np.array(pos_scores + neg_scores)
-                    pos_ranks = np.where(scores.argsort()[::-1] < num_pos)[0]
+                    pos_ranks = np.where(scores.argsort(kind="stable")[::-1] < num_pos)[0]
                     pos_ranks = np.minimum(pos_ranks, self.max_top_k)
                     self.query_recall_at_k[iou_idx][query_id][pos_ranks] = 1 / num_pos
         self.query_recall_at_k = self.query_recall_at_k.cumsum(axis=-1)
