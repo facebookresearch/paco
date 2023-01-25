@@ -9,9 +9,7 @@ Copy of https://github.com/facebookresearch/detectron2/blob/main/tools/lazyconfi
 """
 import logging
 
-# TODO: anmolkalia better way to do this?
 import paco.data.datasets  # noqa
-
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import instantiate, LazyConfig
 from detectron2.engine import (
