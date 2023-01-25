@@ -185,7 +185,7 @@ def _evaluate_predictions_on_lvis(
 
     logger = logging.getLogger(__name__)
 
-    if len(lvis_results) == 0:  # TODO: check if needed
+    if len(lvis_results) == 0:
         logger.warn("No predictions from the model!")
         return {metric: float("nan") for metric in metrics}
 

@@ -68,7 +68,6 @@ def parse_args():
     parser.add_argument(
         "--name", default="detectron2_job", type=str, help="Name of the job"
     )
-    # equivalent of buck target in fbcode's launcher
     parser.add_argument(
         "--target",
         default="lightning_train_net.py",
