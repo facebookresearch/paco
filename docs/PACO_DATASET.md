@@ -40,10 +40,10 @@ data["images"]: # a list of dictionaries, each dictionary corresponds to one ima
     'file_name':                            str,
     'width':                                int,
     'height':                               int,
-    'neg_category_ids':                     list,
-    'not_exhaustive_category_ids':          list,
-    'neg_category_ids_attrs':               list,
-    'not_exhaustive_category_ids_attrs':    list,
+    'neg_category_ids':                     List[int],
+    'not_exhaustive_category_ids':          List[int],
+    'neg_category_ids_attrs':               List[int],
+    'not_exhaustive_category_ids_attrs':    List[int],
     'license':                              int,
 }
 data["annotations"]: # a list of dictionaries, each dictionary corresponds to one object or part bounding box
@@ -92,6 +92,16 @@ data["attr_type_to_attr_idxs"]: # dictionary, key is the attribute name (one of:
     'pattern_marking':  range(30,41),
     'material':         range(41,55),
     'transparency':     range(55,59)
+}
+data['queries']: # (test dataset only) a list of dictionaries, each dictionary corresponds to one query
+{
+    'id':               int,
+    'level':            int,
+    'query_string':     str,
+    'structured_query': List[Union[str, List[str]]],
+    'pos_ann_ids':      List[int],
+    'neg_ann_ids':      List[int],
+    'neg_im_ids':       List[int],
 }
 ```
 
