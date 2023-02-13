@@ -420,7 +420,6 @@ def extract_query_gt_from_dataset(
     im_id_to_ann_ids = {img["id"]: [] for img in dataset["images"]}
     for ann in dataset["annotations"]:
         im_id_to_ann_ids[ann["image_id"]].append(ann["id"])
-    im_id_to_ann_ids = dict(im_id_to_ann_ids)
 
     # Extract maps between annotation ID and positive and negative queries for
     # that box.
