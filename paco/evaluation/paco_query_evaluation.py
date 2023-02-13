@@ -417,7 +417,7 @@ def extract_query_gt_from_dataset(
                                         is negative.
     """
     # Extract map between image ID and annotation IDs for boxes in that image.
-    im_id_to_ann_ids = defaultdict(list)
+    im_id_to_ann_ids = {img["id"]: [] for img in dataset["images"]}
     for ann in dataset["annotations"]:
         im_id_to_ann_ids[ann["image_id"]].append(ann["id"])
     im_id_to_ann_ids = dict(im_id_to_ann_ids)
