@@ -151,7 +151,8 @@ class PACOQueryEvalAPI:
         """
         # Set defaults.
         if levels is None:
-            levels = ["l1obj", "l1part", "l1", "l2", "l3", "all"]
+            levels = ["l1obj", "l1part"] + [f"l{l}" for l in range(1, 10)] + ["all"]
+            levels = [level for level in levels if level in self.query_subsets]
         if iou_ths is None:
             iou_ths = [None, 0.5, 0.75]
         if ks is None:
