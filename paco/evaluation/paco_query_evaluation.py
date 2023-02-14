@@ -6,7 +6,7 @@
 import copy
 import json
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import detectron2.utils.comm as comm
 import numpy as np
@@ -131,16 +131,46 @@ class PACOQueryEvalAPI:
                 scores = scores[scores > 0.0].tolist()
                 self.query_neg_scores[iou_idx][query_id] += scores
 
-    def evaluate(self) -> None:
+    def evaluate(
+        self,
+        levels: Optional[List[str]] = None,
+        iou_ths: Optional[List[Any]] = None,
+        ks: Optional[List[int]] = None,
+    ) -> None:
         """
         Calculates recalls for individual queries for all k values after per-image
         processing is done.
+
+        Args:
+            levels:     List of query levels for which to calculate average recall,
+                        e.g., "all", "l1obj", "l2", etc.
+            iou_ths:    List of IoU thresholds for which to calculate average recall,
+                        None for all or one of the values in self.iou_thrs
+            ks:         List of top K values for which to calculate average recall,
+                        an int in [1, self.max_top_k] range
         """
+        # Set defaults.
+        if levels is None:
+            levels = ["l1obj", "l1part"] + [f"l{l}" for l in range(1, 10)] + ["all"]
+            levels = [level for level in levels if level in self.query_subsets]
+        if iou_ths is None:
+            iou_ths = [None, 0.5, 0.75]
+        if ks is None:
+            ks = [1, 5, 10]
+        # Check that all levels are available (IoU thresholds and top K values
+        # are checked in _get_average_recall below).
+        extra_levels = set(levels) - set(self.query_subsets.keys())
+        if len(extra_levels) > 0:
+            raise ValueError(
+                f"Query levels {extra_levels} not available in the dataset."
+            )
+        # Caluclate all recalls.
         self._calculate_recalls()
-        for level in ["l1obj", "l1part", "l1", "l2", "l3", "all"]:
+        # Generate results for all levels, IoU thresholds, and top K values.
+        for level in levels:
             query_subset = self.query_subsets[level]
-            for iou_th in [None, 0.5, 0.75]:
-                for k in [1, 5, 10]:
+            for iou_th in iou_ths:
+                for k in ks:
                     case = [f"AR@{k}"]
                     case += [level.upper()]
                     case += [f"IoU{int(iou_th * 100)}" if iou_th is not None else "ALL"]
@@ -306,8 +336,8 @@ class PACOQueryEvalAPI:
                 num_pos = len(pos_scores)
                 if num_pos > 0:
                     scores = np.array(pos_scores + neg_scores)
-                    pos_ranks = np.where(scores.argsort(kind="stable")[::-1] < num_pos)[0]
-                    pos_ranks = np.minimum(pos_ranks, self.max_top_k)
+                    pos_ranks = np.where(scores.argsort(kind="stable")[::-1] < num_pos)
+                    pos_ranks = np.minimum(pos_ranks[0], self.max_top_k)
                     self.query_recall_at_k[iou_idx][query_id][pos_ranks] = 1 / num_pos
         self.query_recall_at_k = self.query_recall_at_k.cumsum(axis=-1)
 
@@ -322,7 +352,9 @@ class PACOQueryEvalAPI:
         if query_subset is not None:
             recalls = recalls[:, query_subset]
         if iou_th is not None:
-            iou_idx = np.where(iou_th == self.iou_thrs)[0]
+            if not np.any(np.isclose(iou_th, self.iou_thrs)):
+                raise ValueError(f"IoU threshold {iou_th} not supported.")
+            iou_idx = np.where(np.isclose(iou_th, self.iou_thrs))[0]
             recalls = recalls[iou_idx]
         return np.mean(recalls)
 
@@ -333,20 +365,7 @@ class PACOQueryEvalAPI:
         instance variables.
         """
         self.query_id_to_string = {}
-        self.query_subsets = {
-            "all": [],
-            "l1": [],
-            "l2": [],
-            "l3": [],
-            "obj": [],
-            "l1obj": [],
-            "l2obj": [],
-            "l3obj": [],
-            "part": [],
-            "l1part": [],
-            "l2part": [],
-            "l3part": [],
-        }
+        self.query_subsets = defaultdict(list)
         for query_id, d in enumerate(sorted(query_dicts, key=lambda x: x["id"])):
             self.query_id_to_string[query_id] = d["query_string"]
             self.query_subsets["all"].append(query_id)
@@ -398,10 +417,9 @@ def extract_query_gt_from_dataset(
                                         is negative.
     """
     # Extract map between image ID and annotation IDs for boxes in that image.
-    im_id_to_ann_ids = defaultdict(list)
+    im_id_to_ann_ids = {img["id"]: [] for img in dataset["images"]}
     for ann in dataset["annotations"]:
         im_id_to_ann_ids[ann["image_id"]].append(ann["id"])
-    im_id_to_ann_ids = dict(im_id_to_ann_ids)
 
     # Extract maps between annotation ID and positive and negative queries for
     # that box.
