@@ -368,18 +368,20 @@ class PACOQueryEvalAPI:
         self.query_subsets = defaultdict(list)
         for query_id, d in enumerate(sorted(query_dicts, key=lambda x: x["id"])):
             self.query_id_to_string[query_id] = d["query_string"]
-            self.query_subsets["all"].append(query_id)
-            self.query_subsets[f"l{d['level']}"].append(query_id)
-            # Find whether this is an object only query.
-            cat = d["structured_query"][0]
-            is_obj = all([thing == cat for _, thing in d["structured_query"][1:]])
-            # Populate object/part subsets.
-            if is_obj:
-                self.query_subsets["obj"].append(query_id)
-                self.query_subsets[f"l{d['level']}obj"].append(query_id)
-            else:
-                self.query_subsets["part"].append(query_id)
-                self.query_subsets[f"l{d['level']}part"].append(query_id)
+            # Consider query only if it has at least one positive.
+            if len(d["pos_ann_ids"]) > 0:
+                self.query_subsets["all"].append(query_id)
+                self.query_subsets[f"l{d['level']}"].append(query_id)
+                # Find whether this is an object only query.
+                cat = d["structured_query"][0]
+                is_obj = all([thing == cat for _, thing in d["structured_query"][1:]])
+                # Populate object/part subsets.
+                if is_obj:
+                    self.query_subsets["obj"].append(query_id)
+                    self.query_subsets[f"l{d['level']}obj"].append(query_id)
+                else:
+                    self.query_subsets["part"].append(query_id)
+                    self.query_subsets[f"l{d['level']}part"].append(query_id)
         self.num_queries = len(self.query_id_to_string)
         self.query_subsets = {k: np.array(v) for k, v in self.query_subsets.items()}
 
