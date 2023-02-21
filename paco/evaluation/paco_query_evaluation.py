@@ -496,16 +496,17 @@ class PACOQueryPredictionEvaluator:
             predictions:    List of prediction dictionaries for images in the dataset.
                             Each dictionary contains the following fields:
                             image_id:       int
-                            bboxes:         (K, 4) tensor of detected bounding boxes
+                            bboxes:         (K, 4) tensor or numpy array of detected
+                                            bounding boxes
                             AND EITHER
-                            scores:         (K, M) tensor of query scores for each
-                                            detected bounding box and each of the M
-                                            queries
+                            scores:         (K, M) tensor or numpy array of query
+                                            scores for each detected bounding box and
+                                            each of the M queries
                             OR
-                            box_scores:     (K, ) tensor of query scores for each
-                                            detected bounding box
-                            pred_classes:   (K, ) tensor of query IDs for each detected
-                                            bounding box
+                            box_scores:     (K, ) tensor or numpy array of query scores
+                                            for each detected bounding box
+                            pred_classes:   (K, ) tensor or numpy array of query IDs
+                                            for each detected bounding box
         """
         # Check consistency.
         assert "queries" in dataset, "Invalid dataset, missing queries field."
@@ -585,9 +586,9 @@ class PACOQueryPredictionEvaluator:
             assert (
                 prediction["scores"].shape[1] == num_queries
             ), "Number of scores different from number of queries."
-            # Just convert to numpy.
-            det_bboxes = prediction["bboxes"].numpy()
-            det_scores = prediction["scores"].numpy()
+            # Just convert to numpy if needed.
+            det_bboxes = self._to_numpy(prediction["bboxes"])
+            det_scores = self._to_numpy(prediction["scores"])
         elif "box_scores" in prediction and "pred_classes" in prediction:
             # Check consistency.
             assert (
@@ -597,7 +598,7 @@ class PACOQueryPredictionEvaluator:
                 prediction["bboxes"].shape[0] == prediction["pred_classes"].shape[0]
             ), "Number of boxes and labels mismatches"
             # Deduplicate boxes if desired.
-            bboxes = prediction["bboxes"].numpy()
+            bboxes = self._to_numpy(prediction["bboxes"])
             if deduplicate_boxes:
                 num_unique_bboxes = 0
                 bbox_ids = -1 * np.ones(len(bboxes), dtype=int)
@@ -612,17 +613,20 @@ class PACOQueryPredictionEvaluator:
                 bbox_ids = np.arange(len(bboxes))
                 unique_bboxes = bboxes
             # Build the NxM score array, N being the number of unique boxes.
-            bbox_ids = torch.from_numpy(bbox_ids)
-            box_scores = prediction["box_scores"]
-            pred_classes = prediction["pred_classes"]
-            scores = box_scores.new_zeros(len(unique_bboxes), num_queries)
+            box_scores = self._to_numpy(prediction["box_scores"])
+            pred_classes = self._to_numpy(prediction["pred_classes"])
+            scores = np.zeros_like(box_scores, shape=(len(unique_bboxes), num_queries))
             scores[bbox_ids, pred_classes] = box_scores
             det_bboxes = unique_bboxes
-            det_scores = scores.numpy()
+            det_scores = scores
         else:
             det_bboxes = np.empty((0, 4))
             det_scores = np.empty((0, num_queries))
         return det_bboxes, det_scores
+
+    @staticmethod
+    def _to_numpy(arr):
+        return arr if isinstance(arr, np.ndarray) else arr.numpy()
 
 
 class PACOQueryEvaluator(ACDumper):
