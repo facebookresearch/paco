@@ -73,10 +73,11 @@ class PACOQueryEvalAPI:
         each query.
 
         Args:
-            det_bboxes:             (K, 4) array of detected bounding boxes
+            det_bboxes:             (K, 4) array of detected bounding boxes in XYXY
+                                    format
             det_scores:             (K, M) array of query scores for each detected
                                     bounding box
-            gt_bboxes:              (N, 4) array of GT bounding boxes
+            gt_bboxes:              (N, 4) array of GT bounding boxes in XYXY format
             gt_bbox_pos_query_ids:  (N, BPmax) array of positive query IDs for each GT
                                     bounding box
             gt_bbox_neg_query_ids:  (N, BNmax) array of negative query IDs for each GT
@@ -497,7 +498,7 @@ class PACOQueryPredictionEvaluator:
                             Each dictionary contains the following fields:
                             image_id:       int
                             bboxes:         (K, 4) tensor or numpy array of detected
-                                            bounding boxes
+                                            bounding boxes in XYXY format
                             AND EITHER
                             scores:         (K, M) tensor or numpy array of query
                                             scores for each detected bounding box and
