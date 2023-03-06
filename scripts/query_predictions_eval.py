@@ -5,9 +5,11 @@
 
 import argparse
 import json
+import numpy as np
+import os
 import torch
 
-from paco.data.datasets.builtin import _PREDEFINED_PACO_LVIS, _PREDEFINED_PACO_EGO4D
+from paco.data.datasets.builtin import _PREDEFINED_PACO
 from paco.evaluation.paco_query_evaluation import PACOQueryPredictionEvaluator
 
 
@@ -17,9 +19,9 @@ def get_arg_parser():
     )
     parser.add_argument(
         "--predictions_file_name",
-        help="Path to a predictions dump .pth file that can be loaded using "
-        "torch.load(). See PACOQueryPredictionEvaluator docstring for the "
-        "predictions dump format.",
+        help="Path to a predictions dump .pth or .npy file that can be loaded using "
+        "torch.load() or numpy.load(). See PACOQueryPredictionEvaluator docstring "
+        "for the predictions dump format.",
         required=True,
     )
     parser.add_argument(
@@ -39,9 +41,9 @@ if __name__ == "__main__":
     args = get_arg_parser().parse_args()
     if args.dataset_file_name is None:
         if "ego4d" in args.predictions_file_name:
-            dataset_file_name = _PREDEFINED_PACO_EGO4D["paco_ego4d_v1_test"][0]
+            dataset_file_name = _PREDEFINED_PACO["paco_ego4d_v1_test"][0]
         else:
-            dataset_file_name = _PREDEFINED_PACO_LVIS["paco_lvis_v1_test"][0]
+            dataset_file_name = _PREDEFINED_PACO["paco_lvis_v1_test"][0]
     if args.deduplicate_boxes is None:
         args.deduplicate_boxes = "mdetr" not in args.predictions_file_name
     print(args)
@@ -54,7 +56,13 @@ if __name__ == "__main__":
 
     # Load the predictions.
     print("Loading predictions...")
-    predictions = torch.load(args.predictions_file_name)
+    ext = os.path.splitext(args.predictions_file_name)[-1]
+    if ext == ".pth":
+        predictions = torch.load(args.predictions_file_name)
+    elif ext == ".npy":
+        predictions = np.load(args.predictions_file_name, allow_pickle=True)
+    else:
+        raise ValueError(f"Unsupported input file format {ext}, only .pth or .npy are supported.")
 
     # Instantiate the evaluator.
     qeval = PACOQueryPredictionEvaluator(dataset, predictions)
