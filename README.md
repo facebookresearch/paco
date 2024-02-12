@@ -37,8 +37,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 To train and evaluate on PACO dataset using this repo, please download the train2017 and val2017 COCO images (PACO-LVIS uses them), PACO annotations, and PACO-EGO4D frames. Then setup the following environment variables:
 ```
 conda env config vars set PACO_ANNOTATION_ROOT=/path/to/paco/annotations
-conda env config vars set PACO_IMAGES_ROOT=/path/to/paco/images
-conda env config vars set COCO_IMAGES_ROOT=/path/to/coco/images
+conda env config vars set PACO_IMAGE_ROOT=/path/to/paco/images
+conda env config vars set COCO_IMAGE_ROOT=/path/to/coco/images
 conda activate paco
 ```
 
