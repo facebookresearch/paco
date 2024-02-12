@@ -48,7 +48,7 @@ cd /path/to/paco/annotations
 wget https://dl.fbaipublicfiles.com/paco/annotations/paco_lvis_v1.zip
 wget https://dl.fbaipublicfiles.com/paco/annotations/paco_ego4d_v1.zip
 diff <(sha256sum paco_lvis_v1.zip) <(echo "02ac4edb22c251e07853e6231d69aec3fad0a180f03de2f8c880650322debc80  paco_lvis_v1.zip")
-diff <(sha256sum paco_ego4d_v1.zip) <(echo "5be2b35ce32f1b76ffafa54a075dd660baa1816d446736ad5a23897848719515  paco_ego4d_v1.zip")
+diff <(sha256sum paco_ego4d_v1.zip) <(echo "9a2de524dd64ad8f807f0d1ad2e96de590b9fb222e55192ccfdd7b7b09b89252  paco_ego4d_v1.zip")
 ```
 and if SHA-256 checksum matches
 ```
